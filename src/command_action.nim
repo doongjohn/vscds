@@ -62,11 +62,9 @@ proc cmdSwapData*(this: CommandObject, inputArgs: seq[string]) =
 
 
 proc cmdSwapAndRun*(this: CommandObject, inputArgs: seq[string]) =
-  try:
-    cmdSwapData(this, inputArgs[0 .. 0])
+  cmdSwapData(this, inputArgs[0 .. 0])
+  if inputArgs.len > 1:
     cmdRunVSCode(this, inputArgs[1 .. ^1])
-  except:
-    echo getCurrentExceptionMsg()
 
 
 proc cmdNewData*(this: CommandObject, inputArgs: seq[string]) =
