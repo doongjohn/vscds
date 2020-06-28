@@ -147,12 +147,15 @@ proc cmdListAll*(this: CommandObject, inputOptions: seq[string]) =
 proc cmdRunVSCode*(this: CommandObject, inputOptions: seq[string]) =
   let execCommand = block:
     var res = settings.vscodeRunCommand
-    if inputOptions.len != 0: 
-      for i in inputOptions: res &= " " & i
+    if inputOptions.len != 0: (for i in inputOptions: res &= " " & i)
     res
-  say &"Command result: {execCmdEx(execCommand)}"
+  let execRes = execCmdEx(execCommand)
+  say &"Command output: {execRes.output.strip()}"
+  say &"Command exit code: {execRes.exitCode}"
 
 
 proc cmdRevealVSCodeDirectory*(this: CommandObject, inputOptions: seq[string]) =
   # explorer.exe is launched successfully, it returns "1"
-  say &"Command result: {execCmdEx(settings.vscodeRevealCommand)}"
+  let execRes = execCmdEx(settings.vscodeRevealCommand)
+  say &"Command output: {execRes.output.strip()}"
+  say &"Command exit code: {execRes.exitCode}"

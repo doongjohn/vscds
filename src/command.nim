@@ -119,9 +119,9 @@ template checkOptions(this: CommandObject, inputOptions: seq[string]) =
 proc getInputAndRunCommand*() =
   say ""
   say "", "> "
-  let input = stdin.readLine().splitWhitespace().toLowerAscii()
+  let input = stdin.readLine().toLowerAscii().splitWhitespace()
   let inputKeyword: string = if input.len > 0: input[0] else: ""
-  let inputOptions: seq[string] = if input.len > 1: input[1..input.high] else: @[]
+  let inputOptions: seq[string] = if input.len > 1: input[1..^1] else: @[]
   for obj in commandObjects:
     for keyword in obj.keywords:
       if inputKeyword == keyword:
