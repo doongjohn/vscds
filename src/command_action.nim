@@ -1,4 +1,5 @@
 {.experimental: "codeReordering".}
+
 import os
 import osproc
 import strutils
@@ -152,11 +153,17 @@ proc cmdListAll*(this: CommandObject, inputArgs: seq[string]) =
 
 
 proc cmdRunVSCode*(this: CommandObject, inputArgs: seq[string]) =
-  discard startProcess(settings.vscodeRunCommand, args = inputArgs)
-  say "Running VSCode..."
+  try:
+    discard startProcess(settings.vscodeRunCommand, args = inputArgs)
+    say "Running VSCode..."
+  except:
+    echo getCurrentExceptionMsg()
 
 
 proc cmdRevealVSCodeDirectory*(this: CommandObject, inputArgs: seq[string]) =
-  # explorer.exe is launched successfully, it returns "1"
-  let exitCode = execCmd(settings.vscodeRevealCommand)
-  say &"Command exit code: {exitCode}"
+  try:
+    # explorer.exe is launched successfully, it returns "1"
+    let exitCode = execCmd(settings.vscodeRevealCommand)
+    say &"Command exit code: {exitCode}"
+  except:
+    echo getCurrentExceptionMsg()
