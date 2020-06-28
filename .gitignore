@@ -1,0 +1,7 @@
+# Nim #
+nimcache/
+nimblecache/
+htmldocs/
+
+# Compiled source #
+*.exe
