@@ -1,3 +1,4 @@
+{.experimental: "codeReordering".}
 import os
 import osproc
 import strutils
@@ -11,31 +12,31 @@ proc checkValidDataName(name: string): bool =
   result = not(name.contains("/") or name.contains("\\")) and name.isValidFilename()
 
 
-proc cmdHelp*(this: CommandObject, inputOptions: seq[string]) =
+proc cmdHelp*(this: CommandObject, inputArgs: seq[string]) =
   for cmd_i, cmd in commandObjects:
     say &"{cmd.commandType}: {cmd.desc}"
-    say "Keys", ":"
-    for key in cmd.keywords: stdout.write(" " & key)
+    say "Keywords", ":"
+    for keyword in cmd.keywords: stdout.write(" " & keyword)
     stdout.write "\n"
-    if cmd.options.len != 0:
-      say "Options", ":"
-      for option in cmd.options: stdout.write(" " & option)
+    if cmd.args.len != 0:
+      say "Args", ":"
+      for arg in cmd.args: stdout.write(" " & arg)
       stdout.write "\n"
     if cmd_i != commandObjects.high: say ""
 
 
-proc cmdClear*(this: CommandObject, inputOptions: seq[string]) =
+proc cmdClear*(this: CommandObject, inputArgs: seq[string]) =
   showTitle()
   showBasicInfo()
 
 
-proc cmdExit*(this: CommandObject, inputOptions: seq[string]) =
+proc cmdExit*(this: CommandObject, inputArgs: seq[string]) =
   say "See you soon!"
   quit()
 
 
-proc cmdSwapData*(this: CommandObject, inputOptions: seq[string]) =
-  let newName = inputOptions[0]
+proc cmdSwapData*(this: CommandObject, inputArgs: seq[string]) =
+  let newName = inputArgs[0]
   let curPath = joinPath(settings.vscodePath, "data")
   let newPath = joinPath(settings.vscodePath, settings.dataPrefix & newName)
 
@@ -60,15 +61,23 @@ proc cmdSwapData*(this: CommandObject, inputOptions: seq[string]) =
     echo getCurrentExceptionMsg()
 
 
-proc cmdNewData*(this: CommandObject, inputOptions: seq[string]) =
-  if settings.currentDataName == inputOptions[0]:
+proc cmdSwapAndRun*(this: CommandObject, inputArgs: seq[string]) =
+  try:
+    cmdSwapData(this, inputArgs[0 .. 0])
+    cmdRunVSCode(this, inputArgs[1 .. ^1])
+  except:
+    echo getCurrentExceptionMsg()
+
+
+proc cmdNewData*(this: CommandObject, inputArgs: seq[string]) =
+  if settings.currentDataName == inputArgs[0]:
     say &"It's same name as Current Data!"
     return
-  let path = joinPath(settings.vscodePath, settings.dataPrefix & inputOptions[0])
+  let path = joinPath(settings.vscodePath, settings.dataPrefix & inputArgs[0])
   if path.existsDir():
     say &"This name already exists! \"{path}\"" 
     return
-  if not inputOptions[0].checkValidDataName():
+  if not inputArgs[0].checkValidDataName():
     say &"Invalid name!"
     return
   try:
@@ -78,12 +87,12 @@ proc cmdNewData*(this: CommandObject, inputOptions: seq[string]) =
     echo getCurrentExceptionMsg()
 
 
-proc cmdDeleteData*(this: CommandObject, inputOptions: seq[string]) =
-  if settings.currentDataName == inputOptions[0]:
+proc cmdDeleteData*(this: CommandObject, inputArgs: seq[string]) =
+  if settings.currentDataName == inputArgs[0]:
     say &"You can't delete Current Data!"
     return
   try:
-    let path = joinPath(settings.vscodePath, settings.dataPrefix & inputOptions[0])
+    let path = joinPath(settings.vscodePath, settings.dataPrefix & inputArgs[0])
     if path.existsDir():
       removeDir(path)
       say "Enter \"del\" to confirm", ": "
@@ -95,9 +104,9 @@ proc cmdDeleteData*(this: CommandObject, inputOptions: seq[string]) =
     echo getCurrentExceptionMsg()
 
 
-proc cmdRenameData*(this: CommandObject, inputOptions: seq[string]) =
-  let oldName = inputOptions[0]
-  let newName = inputOptions[1]
+proc cmdRenameData*(this: CommandObject, inputArgs: seq[string]) =
+  let oldName = inputArgs[0]
+  let newName = inputArgs[1]
   let changeCurData = oldName == settings.currentDataName
   let oldPath = joinPath(settings.vscodePath, if changeCurData: "data" else: settings.dataPrefix & oldName)
   let newPath = joinPath(settings.vscodePath, settings.dataPrefix & newName)
@@ -131,7 +140,7 @@ proc cmdRenameData*(this: CommandObject, inputOptions: seq[string]) =
     echo getCurrentExceptionMsg()
 
 
-proc cmdListAll*(this: CommandObject, inputOptions: seq[string]) =
+proc cmdListAll*(this: CommandObject, inputArgs: seq[string]) =
   let curPath = joinPath(settings.vscodePath, "data")
   if curPath.existsDir():
     say &"{settings.currentDataName} (current)"
@@ -144,18 +153,12 @@ proc cmdListAll*(this: CommandObject, inputOptions: seq[string]) =
       say dir.path.replace(settings.dataPrefix, "")
 
 
-proc cmdRunVSCode*(this: CommandObject, inputOptions: seq[string]) =
-  let execCommand = block:
-    var res = settings.vscodeRunCommand
-    if inputOptions.len != 0: (for i in inputOptions: res &= " " & i)
-    res
-  let execRes = execCmdEx(execCommand)
-  say &"Command output: {execRes.output.strip()}"
-  say &"Command exit code: {execRes.exitCode}"
+proc cmdRunVSCode*(this: CommandObject, inputArgs: seq[string]) =
+  discard startProcess(settings.vscodeRunCommand, args = inputArgs)
+  say "Running VSCode..."
 
 
-proc cmdRevealVSCodeDirectory*(this: CommandObject, inputOptions: seq[string]) =
+proc cmdRevealVSCodeDirectory*(this: CommandObject, inputArgs: seq[string]) =
   # explorer.exe is launched successfully, it returns "1"
-  let execRes = execCmdEx(settings.vscodeRevealCommand)
-  say &"Command output: {execRes.output.strip()}"
-  say &"Command exit code: {execRes.exitCode}"
+  let exitCode = execCmd(settings.vscodeRevealCommand)
+  say &"Command exit code: {exitCode}"

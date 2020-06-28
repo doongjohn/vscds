@@ -9,6 +9,7 @@ type Command* {.pure.} = enum
   Clear,
   Exit,
   SwapData,
+  SwapAndRun,
   NewData,
   DeleteData,
   RenameData,
@@ -20,13 +21,13 @@ type CommandObject* = object
   commandType: Command
   desc: string
   keywords: seq[string]
-  options: seq[string]
-  action: proc(this: CommandObject, inputOptions: seq[string]): void
+  args: seq[string]
+  action: proc(this: CommandObject, inputargs: seq[string]): void
 
 func commandType*(this: CommandObject): auto = this.commandType
 func desc*(this: CommandObject): auto = this.desc
 func keywords*(this: CommandObject): auto = this.keywords
-func options*(this: CommandObject): auto = this.options
+func args*(this: CommandObject): auto = this.args
 
 
 var commandObjects* = newSeq[CommandObject]()
@@ -58,28 +59,35 @@ proc setupCommandObjects*() =
     commandType: Command.SwapData,
     desc: "Swaps data folder.",
     keywords: @["swap", "set"],
-    options: @["[DATA NAME]"],
+    args: @["[Data Name]"],
     action: cmdSwapData
+  ))
+  commandObjects.add(CommandObject(
+    commandType: Command.SwapAndRun,
+    desc: "Swaps data folder and run VSCode.",
+    keywords: @["as"],
+    args: @["[Data Name] [Args...]"],
+    action: cmdSwapAndRun
   ))
   commandObjects.add(CommandObject(
     commandType: Command.NewData,
     desc: "Creates new data folder.",
     keywords: @["new"],
-    options: @["[DATA NAME]"],
+    args: @["[Data Name]"],
     action: cmdNewData
   ))
   commandObjects.add(CommandObject(
     commandType: Command.DeleteData,
     desc: "Deletes existing data folder.",
     keywords: @["delete", "del"],
-    options: @["[DATA NAME]"],
+    args: @["[Data Name]"],
     action: cmdDeleteData
   ))
   commandObjects.add(CommandObject(
     commandType: Command.RenameData,
     desc: "Renames existing data folder.",
     keywords: @["rename", "rn"],
-    options: @["[OLD NAME]", "[NEW NAME]"],
+    args: @["[Old Name]", "[New Name]"],
     action: cmdRenameData
   ))
   commandObjects.add(CommandObject(
@@ -92,7 +100,7 @@ proc setupCommandObjects*() =
     commandType: Command.RunVSCode,
     desc: &"Runs VSCode by using command = \"{settings.vscodeRunCommand}\".",
     keywords: @["run", "r"],
-    options: @["[args...]"],
+    args: @["[Args...]"],
     action: cmdRunVSCode
   ))
   commandObjects.add(CommandObject(
@@ -103,14 +111,15 @@ proc setupCommandObjects*() =
   ))
 
 
-template checkOptions(this: CommandObject, inputOptions: seq[string]) =
-  if this.options.len != 0 and this.options[0] != "[args...]":
-    if inputOptions.len > this.options.len:
-      say "Too many options!"
+template checkArgs(this: CommandObject, inputargs: seq[string]) =
+  let argsCount = if this.args.len > 0 and this.args[^1] == "[Args...]": this.args.high else: this.args.len
+  if argsCount > 0:
+    if inputargs.len > argsCount:
+      say "Too many args!"
       return
-    if inputOptions.len < this.options.len:
+    if inputargs.len < argsCount:
       say "Please specify", ":"
-      for i in this.options:
+      for i in this.args:
         stdout.write(" " & i)
       stdout.write "\n"
       return
@@ -121,12 +130,11 @@ proc getInputAndRunCommand*() =
   say "", "> "
   let input = stdin.readLine().toLowerAscii().splitWhitespace()
   let inputKeyword: string = if input.len > 0: input[0] else: ""
-  let inputOptions: seq[string] = if input.len > 1: input[1..^1] else: @[]
+  let inputArgs: seq[string] = if input.len > 1: input[1..^1] else: @[]
   for obj in commandObjects:
     for keyword in obj.keywords:
       if inputKeyword == keyword:
-        obj.checkOptions(inputOptions)
-        obj.action(obj, inputOptions)
+        obj.checkArgs(inputArgs)
+        obj.action(obj, inputArgs)
         return
-  
   say "Invalid Command!"
