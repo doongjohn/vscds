@@ -1,4 +1,5 @@
 import os
+import strutils
 import strformat
 import cli_text
 import app_settings
@@ -13,3 +14,10 @@ proc checkVscDataExists*(): bool =
     createDir(vscDataPath)
     say &"Empty data folder has been created at \"{vscDataPath}\"."
     result = false
+
+
+#----------------------------------------------------------------------------------
+# Check valid file name
+#----------------------------------------------------------------------------------
+proc checkValidFileName*(name: string): bool =
+  result = not(name.contains("/") or name.contains("\\")) and name.isValidFilename()

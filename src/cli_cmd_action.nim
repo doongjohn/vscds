@@ -11,10 +11,6 @@ import cli_cmd
 import eh
 
 
-proc checkValidDataName(name: string): bool =
-  result = not(name.contains("/") or name.contains("\\")) and name.isValidFilename()
-
-
 proc cmdHelp*(this: CommandObject, inputArgs: seq[string]): ref Exception =
   for cmd_i, cmd in commandObjects:
     say &"{cmd.commandType}: {cmd.desc}"
@@ -65,34 +61,42 @@ proc cmdSwapAndRun*(this: CommandObject, inputArgs: seq[string]): ref Exception 
 
 
 proc cmdNewData*(this: CommandObject, inputArgs: seq[string]): ref Exception =
-  if settings.currentDataName == inputArgs[0]:
+  let newName = inputArgs[0]
+  let newPath = joinPath(settings.vscodePath, settings.dataPrefix & newName)
+
+  if newName == settings.currentDataName:
     say &"It's same name as Current Data!"
     return nil
-  let path = joinPath(settings.vscodePath, settings.dataPrefix & inputArgs[0])
-  if path.existsDir():
-    say &"This name already exists! \"{path}\"" 
+  if newPath.existsDir():
+    say &"This name already exists! \"{newPath}\"" 
     return nil
-  if not inputArgs[0].checkValidDataName():
+  if not newName.checkValidFileName():
     say &"Invalid name!"
     return nil
+
   catchException:
-    createDir(path)
-    say &"Successfully created! \"{path}\""
+    createDir(newPath)
+    say &"Successfully created! \"{newPath}\""
 
 
 proc cmdDeleteData*(this: CommandObject, inputArgs: seq[string]): ref Exception =
-  if settings.currentDataName == inputArgs[0]:
+  let delName = inputArgs[0]
+  let delPath = joinPath(settings.vscodePath, settings.dataPrefix & delName)
+
+  if delName == settings.currentDataName:
     say &"You can't delete Current Data!"
     return nil
-  catchException:
-    let path = joinPath(settings.vscodePath, settings.dataPrefix & inputArgs[0])
-    if path.existsDir():
-      removeDir(path)
+
+  if delPath.existsDir():
+    catchException:
+      removeDir(delPath)
       say "Enter \"del\" to confirm", ": "
-      if stdin.readLine() == "del": say &"Successfully removed: \"{path}\""
-      else: say &"Delete canceled!"
-    else:
-      say &"Can't find directory! \"{path}\""
+      if stdin.readLine() == "del":
+        say &"Successfully removed: \"{delPath}\""
+      else:
+        say &"Delete canceled!"
+  else:
+    say &"Can't find directory! \"{delPath}\""
 
 
 proc cmdRenameData*(this: CommandObject, inputArgs: seq[string]): ref Exception =
@@ -112,7 +116,7 @@ proc cmdRenameData*(this: CommandObject, inputArgs: seq[string]): ref Exception 
   if newPath.existsDir():
     say &"This name already exists! \"{newPath}\"" 
     return nil
-  if not newName.checkValidDataName():
+  if not newName.checkValidFileName():
     say &"Invalid name!"
     return nil
   if oldName == newName:
