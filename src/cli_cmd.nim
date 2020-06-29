@@ -1,7 +1,9 @@
+import sugar
 import strutils
 import strformat
 import app_settings
 import cli_text
+import eh
 
 
 #----------------------------------------------------------------------------------
@@ -154,6 +156,6 @@ proc getInputAndRunCommand*() =
     for keyword in obj.keywords:
       if inputKeyword == keyword:
         obj.checkArgs(inputArgs)
-        discard obj.action(obj, inputArgs)
+        obj.action(obj, inputArgs).whenErr((err: Exception) => echo err.msg)
         return
   say "Invalid Command!"

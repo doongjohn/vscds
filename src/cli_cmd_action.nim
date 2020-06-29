@@ -14,14 +14,20 @@ import eh
 proc cmdHelp*(this: CommandObject, inputArgs: seq[string]): ref Exception =
   for cmd_i, cmd in commandObjects:
     say &"{cmd.commandType}: {cmd.desc}"
+    
     say "Keywords", ":"
-    for keyword in cmd.keywords: stdout.write(" " & keyword)
+    for keyword_i, keyword in cmd.keywords:
+      stdout.write((if keyword_i != 0: ", " else: " ") & keyword)
     stdout.write "\n"
-    if cmd.args.len != 0:
+    
+    if cmd.args.len > 0:
       say "Args", ":"
-      for arg in cmd.args: stdout.write(" " & arg)
+      for arg in cmd.args:
+        stdout.write(" " & arg)
       stdout.write "\n"
-    if cmd_i != commandObjects.high: say ""
+
+    if cmd_i != commandObjects.high:
+      say ""
 
 
 proc cmdClear*(this: CommandObject, inputArgs: seq[string]): ref Exception =
@@ -47,7 +53,7 @@ proc cmdSwapData*(this: CommandObject, inputArgs: seq[string]): ref Exception =
     say &"Can't find target data directory! \"{swapPath}\""
     return nil
   
-  catchException:
+  returnException:
     vscDataPath.moveDir(joinPath(settings.vscodePath, settings.dataPrefix & settings.currentDataName))
     swapPath.moveDir(swapPath)
     say &"Successfully swapped! \"{settings.currentDataName}\" -> \"{swapName}\""
@@ -74,7 +80,7 @@ proc cmdNewData*(this: CommandObject, inputArgs: seq[string]): ref Exception =
     say &"Invalid name!"
     return nil
 
-  catchException:
+  returnException:
     createDir(newPath)
     say &"Successfully created! \"{newPath}\""
 
@@ -88,11 +94,11 @@ proc cmdDeleteData*(this: CommandObject, inputArgs: seq[string]): ref Exception 
     return nil
 
   if delPath.existsDir():
-    catchException:
-      removeDir(delPath)
       say "Enter \"del\" to confirm", ": "
       if stdin.readLine() == "del":
-        say &"Successfully removed: \"{delPath}\""
+        returnException:
+          removeDir(delPath)
+          say &"Successfully removed: \"{delPath}\""
       else:
         say &"Delete canceled!"
   else:
@@ -123,7 +129,7 @@ proc cmdRenameData*(this: CommandObject, inputArgs: seq[string]): ref Exception 
     say &"It's already that name."
     return nil
   
-  catchException:
+  returnException:
     if changeCurData: saveSettingsFile(newName)
     else: oldPath.moveDir(newPath)
     say &"Successfully renamed! \"{oldName}\" -> \"{newName}\""
@@ -137,13 +143,13 @@ proc cmdListAll*(this: CommandObject, inputArgs: seq[string]): ref Exception =
 
 
 proc cmdRunVSCode*(this: CommandObject, inputArgs: seq[string]): ref Exception =
-  catchException:
+  returnException:
     discard startProcess(settings.vscodeRunCommand, args = inputArgs)
     say "Running VSCode..."
 
 
 proc cmdRevealVSCodeDirectory*(this: CommandObject, inputArgs: seq[string]): ref Exception =
-  catchException:
+  returnException:
     # explorer.exe is launched successfully, it returns "1"
     let exitCode = execCmd(settings.vscodeRevealCommand)
     say &"Command exit code: {exitCode}"
