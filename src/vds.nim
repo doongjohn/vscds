@@ -8,9 +8,9 @@
 # - [X] Run VSCode.
 # - [X] Reveal VSCode directory in explorer.
 
-import settings_manager
-import console_interface
-import command
+import app_settings
+import cli_text
+import cli_cmd
 
 
 proc main() =

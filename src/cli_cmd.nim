@@ -1,7 +1,7 @@
 import strutils
 import strformat
-import settings_manager
-import console_interface
+import app_settings
+import cli_text
 
 
 type Command* {.pure.} = enum
@@ -22,7 +22,7 @@ type CommandObject* = object
   desc: string
   keywords: seq[string]
   args: seq[string]
-  action: proc(this: CommandObject, inputargs: seq[string]): void
+  action: proc(this: CommandObject, inputargs: seq[string]): ref Exception
 
 func commandType*(this: CommandObject): auto = this.commandType
 func desc*(this: CommandObject): auto = this.desc
@@ -33,7 +33,7 @@ func args*(this: CommandObject): auto = this.args
 var commandObjects* = newSeq[CommandObject]()
 
 
-import command_action
+import cli_cmd_action
 
 
 proc setupCommandObjects*() =
@@ -135,6 +135,6 @@ proc getInputAndRunCommand*() =
     for keyword in obj.keywords:
       if inputKeyword == keyword:
         obj.checkArgs(inputArgs)
-        obj.action(obj, inputArgs)
+        discard obj.action(obj, inputArgs)
         return
   say "Invalid Command!"
