@@ -4,6 +4,9 @@ import app_settings
 import cli_text
 
 
+#----------------------------------------------------------------------------------
+# Command enum
+#----------------------------------------------------------------------------------
 type Command* {.pure.} = enum
   Help,
   Clear,
@@ -17,6 +20,10 @@ type Command* {.pure.} = enum
   RunVSCode,
   RevealVSCodeDirectory
 
+
+#----------------------------------------------------------------------------------
+# Command object
+#----------------------------------------------------------------------------------
 type CommandObject* = object
   commandType: Command
   desc: string
@@ -30,9 +37,15 @@ func keywords*(this: CommandObject): auto = this.keywords
 func args*(this: CommandObject): auto = this.args
 
 
+#----------------------------------------------------------------------------------
+# All Command objects
+#----------------------------------------------------------------------------------
 var commandObjects* = newSeq[CommandObject]()
 
 
+#----------------------------------------------------------------------------------
+# Setup Command objects
+#----------------------------------------------------------------------------------
 import cli_cmd_action
 
 
@@ -111,6 +124,9 @@ proc setupCommandObjects*() =
   ))
 
 
+#----------------------------------------------------------------------------------
+# Check Command args
+#----------------------------------------------------------------------------------
 template checkArgs(this: CommandObject, inputargs: seq[string]) =
   let argsCount = if this.args.len > 0 and this.args[^1] == "[Args...]": this.args.high else: this.args.len
   if argsCount > 0:
@@ -125,6 +141,9 @@ template checkArgs(this: CommandObject, inputargs: seq[string]) =
       return
 
 
+#----------------------------------------------------------------------------------
+# Get input and run command (Run this in a loop)
+#----------------------------------------------------------------------------------
 proc getInputAndRunCommand*() =
   say ""
   say "", "> "

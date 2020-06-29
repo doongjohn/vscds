@@ -15,5 +15,9 @@ proc showTitle*() =
 
 
 proc showBasicInfo*() =
-  say "Version: 0.1.0"
+  say "Welcome back!"
   say "Enter \"help\" or \"?\" for help."
+
+
+proc showExitText*() =
+  say "See you soon!"

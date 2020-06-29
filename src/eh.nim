@@ -4,6 +4,7 @@ template whenOk*(e: ref Exception, body: untyped) =
   else:
     echo e.msg
 
+
 template catchException*(body: untyped) =
   try:
     body

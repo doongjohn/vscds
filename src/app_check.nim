@@ -3,7 +3,9 @@ import strformat
 import cli_text
 import app_settings
 
-
+#----------------------------------------------------------------------------------
+# Check vscode data folder exists
+#----------------------------------------------------------------------------------
 proc checkVscDataExists*(): bool =
   result = true
   if not vscDataPath.existsDir():

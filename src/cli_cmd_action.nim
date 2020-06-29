@@ -34,7 +34,7 @@ proc cmdClear*(this: CommandObject, inputArgs: seq[string]): ref Exception =
 
 
 proc cmdExit*(this: CommandObject, inputArgs: seq[string]): ref Exception =
-  say "See you soon!"
+  showExitText()
   quit()
 
 
