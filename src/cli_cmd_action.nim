@@ -2,6 +2,7 @@
 
 import os
 import osproc
+import sugar
 import strutils
 import strformat
 import app_settings
@@ -61,9 +62,11 @@ proc cmdSwapData*(this: CommandObject, inputArgs: seq[string]): ref Exception =
 
 
 proc cmdSwapAndRun*(this: CommandObject, inputArgs: seq[string]): ref Exception =
-  cmdSwapData(this, inputArgs[0 .. 0]).whenOK:
-    if inputArgs.len > 1:
-      discard cmdRunVSCode(this, inputArgs[1 .. ^1])
+  var res = result
+  cmdSwapData(this, inputArgs[0 .. 0])
+    .whenOK(() => (if inputArgs.len > 1: res = cmdRunVSCode(this, inputArgs[1 .. ^1])))
+    .whenErr((err: ref Exception) => (res = err))
+  return res
 
 
 proc cmdNewData*(this: CommandObject, inputArgs: seq[string]): ref Exception =
