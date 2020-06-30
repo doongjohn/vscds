@@ -73,7 +73,7 @@ proc setupCommandObjects*() =
   commandObjects.add(CommandObject(
     commandType: Command.SwapData,
     desc: "Swaps data folder.",
-    keywords: @["swap", "set"],
+    keywords: @["swap", "to"],
     args: @["[Data Name]"],
     action: cmdSwapData
   ))
@@ -87,7 +87,7 @@ proc setupCommandObjects*() =
   commandObjects.add(CommandObject(
     commandType: Command.NewData,
     desc: "Creates new data folder.",
-    keywords: @["new"],
+    keywords: @["create", "new"],
     args: @["[Data Name]"],
     action: cmdNewData
   ))
