@@ -16,13 +16,13 @@ proc cmdHelp*(this: CommandObject, inputArgs: seq[string]): ref Exception =
   for cmd_i, cmd in commandObjects:
     say &"{cmd.commandType}: {cmd.desc}"
     
-    say "Keywords", ":"
+    say "Keywords:", lineBreak = false
     for keyword_i, keyword in cmd.keywords:
       stdout.write((if keyword_i != 0: ", " else: " ") & keyword)
     stdout.write "\n"
     
     if cmd.args.len > 0:
-      say "Args", ":"
+      say "Args:", lineBreak = false
       for arg in cmd.args:
         stdout.write(" " & arg)
       stdout.write "\n"
@@ -46,17 +46,15 @@ proc cmdSwapData*(this: CommandObject, inputArgs: seq[string]): ref Exception =
   let swapPath = joinPath(settings.vscodePath, settings.dataPrefix & swapName)
 
   if not checkVscDataExists():
-    return nil
+    return noDataFolderFoundError()
   if swapName == settings.currentDataName:
-    say &"Already set to \"{swapName}\"."
-    return nil
+    return newException(Exception, &"Already set to \"{swapName}\".")
   if not swapPath.existsDir():
-    say &"Can't find target data directory! \"{swapPath}\""
-    return nil
+    return newException(Exception, &"Can't find target data directory! \"{swapPath}\"")
   
   returnException:
     vscDataPath.moveDir(joinPath(settings.vscodePath, settings.dataPrefix & settings.currentDataName))
-    swapPath.moveDir(swapPath)
+    swapPath.moveDir(vscDataPath)
     say &"Successfully swapped! \"{settings.currentDataName}\" -> \"{swapName}\""
     saveSettingsFile(swapName)
 
@@ -74,14 +72,11 @@ proc cmdNewData*(this: CommandObject, inputArgs: seq[string]): ref Exception =
   let newPath = joinPath(settings.vscodePath, settings.dataPrefix & newName)
 
   if newName == settings.currentDataName:
-    say &"It's same name as Current Data!"
-    return nil
+    return newException(Exception, &"It's same name as Current Data!")
   if newPath.existsDir():
-    say &"This name already exists! \"{newPath}\"" 
-    return nil
+    return newException(Exception, &"This name already exists! \"{newPath}\"")
   if not newName.checkValidFileName():
-    say &"Invalid name!"
-    return nil
+    return newException(Exception, &"Invalid name!")
 
   returnException:
     createDir(newPath)
@@ -93,11 +88,10 @@ proc cmdDeleteData*(this: CommandObject, inputArgs: seq[string]): ref Exception 
   let delPath = joinPath(settings.vscodePath, settings.dataPrefix & delName)
 
   if delName == settings.currentDataName:
-    say &"You can't delete Current Data!"
-    return nil
+    return newException(Exception, &"You can't delete Current Data!")
 
   if delPath.existsDir():
-      say "Enter \"del\" to confirm", ": "
+      say "Enter \"del\" to confirm: ", lineBreak = false
       if stdin.readLine() == "del":
         returnException:
           removeDir(delPath)
@@ -105,7 +99,7 @@ proc cmdDeleteData*(this: CommandObject, inputArgs: seq[string]): ref Exception 
       else:
         say &"Delete canceled!"
   else:
-    say &"Can't find directory! \"{delPath}\""
+    return newException(Exception, &"Can't find directory! \"{delPath}\"")
 
 
 proc cmdRenameData*(this: CommandObject, inputArgs: seq[string]): ref Exception =
@@ -116,21 +110,18 @@ proc cmdRenameData*(this: CommandObject, inputArgs: seq[string]): ref Exception 
   let newPath = joinPath(settings.vscodePath, settings.dataPrefix & newName)
   
   if not oldPath.existsDir():
-    say &"Can't find directory! \"{oldPath}\"!"
-    if changeCurData: discard checkVscDataExists()
-    return nil
+    if changeCurData and not checkVscDataExists():
+      return noDataFolderFoundError()
+    else:
+      return newException(Exception, &"Can't find directory! \"{oldPath}\"!")
   if settings.currentDataName == newName:
-    say &"It's same name as Current Data! \"{settings.currentDataName}\""
-    return nil
+    return newException(Exception, &"It's same name as Current Data! \"{settings.currentDataName}\"")
   if newPath.existsDir():
-    say &"This name already exists! \"{newPath}\"" 
-    return nil
+    return newException(Exception, &"This name already exists! \"{newPath}\"")
   if not newName.checkValidFileName():
-    say &"Invalid name!"
-    return nil
+    return newException(Exception, &"Invalid name!")
   if oldName == newName:
-    say &"It's already that name."
-    return nil
+    return newException(Exception, &"It's already that name.")
   
   returnException:
     if changeCurData: saveSettingsFile(newName)

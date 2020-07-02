@@ -1,6 +1,7 @@
 import sugar
 import strutils
 import strformat
+import terminal
 import app_settings
 import cli_text
 import eh
@@ -81,7 +82,7 @@ proc setupCommandObjects*() =
     commandType: Command.SwapAndRun,
     desc: "Swaps data folder and run VSCode.",
     keywords: @["as"],
-    args: @["[Data Name] [Args...]"],
+    args: @["[Data Name]", "[Args...]"],
     action: cmdSwapAndRun
   ))
   commandObjects.add(CommandObject(
@@ -129,18 +130,23 @@ proc setupCommandObjects*() =
 #----------------------------------------------------------------------------------
 # Check Command args
 #----------------------------------------------------------------------------------
-template checkArgs(this: CommandObject, inputargs: seq[string]) =
-  let argsCount = if this.args.len > 0 and this.args[^1] == "[Args...]": this.args.high else: this.args.len
-  if argsCount > 0:
-    if inputargs.len > argsCount:
-      say "Too many args!"
-      return
-    if inputargs.len < argsCount:
-      say "Please specify", ":"
-      for i in this.args:
-        stdout.write(" " & i)
-      stdout.write "\n"
-      return
+template checkArgs(this: CommandObject, inputArgs: seq[string]) =
+  if this.args.len == 0 and inputArgs.len > 0:
+    say "This command needs no argument!"
+    return
+  
+  let noLimit = this.args.len > 0 and this.args[^1] == "[Args...]"
+  let minArgsCount = if this.args.len > 0 and noLimit: this.args.high else: this.args.len
+  
+  if not noLimit and inputArgs.len > minArgsCount:
+    say "Too many args!"
+    return
+  
+  if inputArgs.len < minArgsCount:
+    say "Please specify:", lineBreak = false
+    for arg in this.args: stdout.write(" " & arg)
+    stdout.write "\n"
+    return
 
 
 #----------------------------------------------------------------------------------
@@ -148,14 +154,23 @@ template checkArgs(this: CommandObject, inputargs: seq[string]) =
 #----------------------------------------------------------------------------------
 proc getInputAndRunCommand*() =
   say ""
-  say "", "> "
-  let input = stdin.readLine().toLowerAscii().splitWhitespace()
-  let inputKeyword: string = if input.len > 0: input[0] else: ""
-  let inputArgs: seq[string] = if input.len > 1: input[1..^1] else: @[]
+  say "", ">> ", false
+  let inputs = stdin.readLine().toLowerAscii().splitWhitespace()
+  if inputs.len == 0:
+    say "Invalid Command!"
+    return
+  
+  let inputKeyword = inputs[0]
+  if inputKeyword == "":
+    say "Invalid Command!"
+    return
+  
+  let inputArgs = if inputs.len > 1: inputs[1 .. ^1] else: @[]
   for obj in commandObjects:
     for keyword in obj.keywords:
       if inputKeyword == keyword:
         obj.checkArgs(inputArgs)
-        obj.action(obj, inputArgs).whenErr((err: Exception) => echo err.msg)
+        obj.action(obj, inputArgs).whenErr((err: Exception) => say &"※ ERROR ※\n{err.msg}")
         return
+  
   say "Invalid Command!"
