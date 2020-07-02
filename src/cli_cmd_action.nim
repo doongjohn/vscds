@@ -62,7 +62,7 @@ proc cmdSwapData*(this: CommandObject, inputArgs: seq[string]): ref Exception =
 proc cmdSwapAndRun*(this: CommandObject, inputArgs: seq[string]): ref Exception =
   var res = result
   cmdSwapData(this, inputArgs[0 .. 0])
-    .whenOK(() => (if inputArgs.len > 1: res = cmdRunVSCode(this, inputArgs[1 .. ^1])))
+    .whenOK(() => (res = cmdRunVSCode(this, if inputArgs.len > 1: inputArgs[1 .. ^1] else: @[])))
     .whenErr((err: ref Exception) => (res = err))
   return res
 
