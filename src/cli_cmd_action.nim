@@ -16,13 +16,13 @@ proc cmdHelp*(this: CommandObject, inputArgs: seq[string]): ref Exception =
   for cmd_i, cmd in commandObjects:
     say &"{cmd.commandType}: {cmd.desc}"
     
-    say "Keywords:", lineBreak = false
+    say "  Keywords:", lineBreak = false
     for keyword_i, keyword in cmd.keywords:
       stdout.write((if keyword_i != 0: ", " else: " ") & keyword)
     stdout.write "\n"
     
     if cmd.args.len > 0:
-      say "Args:", lineBreak = false
+      say "  Args:", lineBreak = false
       for arg in cmd.args:
         stdout.write(" " & arg)
       stdout.write "\n"

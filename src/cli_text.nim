@@ -5,8 +5,6 @@ import strformat
 import terminal
 
 
-
-
 proc say*(msg: string, prefix: string = "| ", lineBreak: bool = true) =
   var indent = 0
   for ch in msg:
@@ -20,10 +18,9 @@ proc say*(msg: string, prefix: string = "| ", lineBreak: bool = true) =
     var i = 0
     while i < (line.len.float / termWidth.float).ceil.int:
       var curLine = ""
-      try: curLine = line[i*termWidth .. i*termWidth+termWidth]
+      try: curLine = line[i*termWidth .. i*termWidth+termWidth-1]
       except: curLine = line[i*termWidth .. ^1]
-      # if i != 0: wrapped.write &"{prefix}{' '.repeat(indent)}"
-      if i != 0: wrapped.write &"{prefix}"
+      if i != 0: wrapped.write &"{prefix}{' '.repeat(indent)}"
       wrapped.write curLine
       i.inc()
     wrapped.setPosition(0)
@@ -35,8 +32,7 @@ proc say*(msg: string, prefix: string = "| ", lineBreak: bool = true) =
   var i = 0
   while i < splited.len:
     splited[i] = splited[i].lineWrap()
-    # res.write(if i == 0: &"{prefix}" else: &"\n{prefix}{' '.repeat(indent)}")
-    res.write(if i == 0: &"{prefix}" else: &"\n{prefix}")
+    res.write(if i == 0: &"{prefix}" else: &"\n{prefix}{' '.repeat(indent)}")
     res.write(splited[i])
     i.inc()
   res.setPosition(0)
