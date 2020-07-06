@@ -5,6 +5,7 @@ import osproc
 import sugar
 import strutils
 import strformat
+import terminal
 import app_settings
 import app_check
 import cli_text
@@ -13,21 +14,26 @@ import eh
 
 
 proc cmdHelp*(this: CommandObject, inputArgs: seq[string]): ref Exception =
-  for cmd_i, cmd in commandObjects:
+  for i_cmd, cmd in commandObjects:
     say &"{cmd.commandType}: {cmd.desc}"
     
-    say "  Keywords:", lineBreak = false
-    for keyword_i, keyword in cmd.keywords:
-      stdout.write((if keyword_i != 0: ", " else: " ") & keyword)
-    stdout.write "\n"
+    stdout.setForegroundColor(ForegroundColor.fgBlue)
+    sayAdd "  Keywords:"
+    for i_keyword, keyword in cmd.keywords:
+      sayAdd (if i_keyword != 0: ", " else: " ")
+      sayAdd keyword
+    sayIt()
     
-    if cmd.args.len > 0:
-      say "  Args:", lineBreak = false
-      for arg in cmd.args:
-        stdout.write(" " & arg)
-      stdout.write "\n"
-
-    if cmd_i != commandObjects.high:
+    stdout.setForegroundColor(ForegroundColor.fgGreen)
+    if cmd.args.len != 0:
+      sayAdd "  Args:"
+      for i, arg in cmd.args:
+        sayAdd " "
+        sayAdd arg
+      sayIt()
+    
+    stdout.setForegroundColor(ForegroundColor.fgWhite)
+    if i_cmd != commandObjects.high:
       say ""
 
 
