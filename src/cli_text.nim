@@ -1,44 +1,61 @@
+{.experimental: "codeReordering".}
+
 import math
 import streams
 import strutils
 import strformat
 import terminal
+import utils
 
 
-proc say*(msg: string, prefix: string = "| ", lineBreak: bool = true) =
+var sayBuffer = newStringStream()
+
+
+proc sayAdd*(msg: string) =
+  sayBuffer.write(msg)
+
+
+proc sayIt*(prefix: string = "| ", lineBreak = true, keepIndent = true) =
+  say(sayBuffer.readAllAndClose(), prefix, lineBreak, keepIndent)
+  sayBuffer = newStringStream()
+
+
+proc say*(msg: string, prefix: string = "| ", lineBreak = true, keepIndent = true) =
   var indent = 0
-  for ch in msg:
-    if ch != ' ': break
-    indent.inc()
+  if keepIndent:
+    for ch in msg:
+      if ch != ' ': break
+      indent.inc
+  
+  let prefixWIndent = if keepIndent: &"{prefix}{' '.repeat(indent)}" else: prefix
+  let writeWidth = if keepIndent: terminalWidth() - prefixWIndent.len() else: terminalWidth() - prefix.len()
   
   proc lineWrap(line: string): string =
-    let termWidth = terminalWidth() - prefix.len
-    if line.len <= termWidth: return line
-    let wrapped = newStringStream("")
+    if line.len <= writeWidth: return line
+    let wrapped = newStringStream()
+    let lineCount = (line.len.float / writeWidth.float).ceil.int
     var i = 0
-    while i < (line.len.float / termWidth.float).ceil.int:
-      var curLine = ""
-      try: curLine = line[i*termWidth .. i*termWidth+termWidth-1]
-      except: curLine = line[i*termWidth .. ^1]
-      if i != 0: wrapped.write &"{prefix}{' '.repeat(indent)}"
-      wrapped.write curLine
-      i.inc()
-    wrapped.setPosition(0)
-    result = wrapped.readAll()
-    wrapped.close()
+    loop(i < lineCount, i.inc):
+      if i != 0: wrapped.write(prefixWIndent)
+      try:
+        wrapped.write(line[i*writeWidth .. i*writeWidth+writeWidth-1])
+        wrapped.write('\n')
+      except:
+        wrapped.write(line[i*writeWidth .. ^1])
+    result = wrapped.readAllAndClose()
   
-  var splited = msg.split('\n')
-  var res = newStringStream("")
+  let res = newStringStream()
+  let splited = msg.split('\n')
   var i = 0
-  while i < splited.len:
-    splited[i] = splited[i].lineWrap()
-    res.write(if i == 0: &"{prefix}" else: &"\n{prefix}{' '.repeat(indent)}")
-    res.write(splited[i])
-    i.inc()
-  res.setPosition(0)
-  if lineBreak: echo res.readAll()
-  else: stdout.write res.readAll()
-  res.close()
+  loop(i < splited.len, i.inc):
+    if i == 0:
+      res.write(prefix)
+    else:
+      res.write('\n')
+      res.write(prefixWIndent)
+    res.write(splited[i].lineWrap())
+  if lineBreak: res.write('\n')
+  stdout.write(res.readAllAndClose())
 
 
 proc showTitle*() =
