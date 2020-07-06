@@ -8,6 +8,7 @@ import terminal
 import utils
 
 
+const defaultPrefix = "| "
 var sayBuffer = newStringStream()
 
 
@@ -15,20 +16,23 @@ proc sayAdd*(msg: string) =
   sayBuffer.write(msg)
 
 
-proc sayIt*(prefix: string = "| ", lineBreak = true, keepIndent = true) =
+proc sayIt*(prefix = defaultPrefix, lineBreak = true, keepIndent = true) =
   say(sayBuffer.readAllAndClose(), prefix, lineBreak, keepIndent)
   sayBuffer = newStringStream()
 
 
-proc say*(msg: string, prefix: string = "| ", lineBreak = true, keepIndent = true) =
-  var indent = 0
-  if keepIndent:
-    for ch in msg:
-      if ch != ' ': break
-      indent.inc
+proc say*(msg: string, prefix = defaultPrefix, lineBreak = true, keepIndent = true) =
+  let prefixWIndent = 
+    if keepIndent:
+      var indent = 0
+      for ch in msg:
+        if ch != ' ': break
+        indent.inc
+      &"{prefix}{' '.repeat(indent)}"
+    else:
+      prefix
   
-  let prefixWIndent = if keepIndent: &"{prefix}{' '.repeat(indent)}" else: prefix
-  let writeWidth = if keepIndent: terminalWidth() - prefixWIndent.len() else: terminalWidth() - prefix.len()
+  let writeWidth = terminalWidth() - (if keepIndent: prefixWIndent.len() else: prefix.len())
   
   proc lineWrap(line: string): string =
     if line.len <= writeWidth: return line
