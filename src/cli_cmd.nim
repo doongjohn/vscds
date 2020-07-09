@@ -1,7 +1,6 @@
 import sugar
 import strutils
 import strformat
-import terminal
 import app_settings
 import cli_text
 import eh
