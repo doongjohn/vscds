@@ -1,18 +1,29 @@
-# VDS
-VSCode Data Swapper
+# VSCode Data Swapper
 
-This console app is a recreation of [VSCodeManager](https://github.com/doongjohn/VSCodeManager) made with [Nim](https://nim-lang.org/)  
-_has different commands!_
+_This is a recreation of [VSCodeManager](https://github.com/doongjohn/VSCodeManager) made with [Nim](https://nim-lang.org/)_
 
-# Installing
+This console app takes advantage of [VS Code Portable Mode](https://code.visualstudio.com/docs/editor/portable) to make your VS Code Environment more Organized.
+
+## What it does
+
+It simply swaps `data` folder!
+
+## How to use
+
+1. install
+1. run vds
+1. configure settings.json
+1. run vds and enter `?` for help
+
+## Installing
 
 using nimble:
 
-```
-not yet
+```nimble
+nimble install vds
 ```
 
-# TODO
+## TODO
 - [x] CMD: Show help.
 - [x] CMD: Swap data folder.
 - [x] CMD: Create data folder.
