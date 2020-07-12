@@ -11,4 +11,4 @@ bin           = @["vds"]
 
 # Dependencies
 
-requires "nim >= 1.2.2"
+requires "nim >= 1.2.0"
