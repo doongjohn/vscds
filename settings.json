@@ -1,7 +1,0 @@
-{
-  "vscodeRunCommand": "code",
-  "vscodeRevealCommand": "explorer \"D:/My Apps/Programming/VS-Code\"",
-  "vscodePath": "D:/My Apps/Programming/VS-Code",
-  "dataPrefix": "data-vscds-",
-  "currentDataName": "nim"
-}
