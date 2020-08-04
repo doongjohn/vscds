@@ -14,10 +14,10 @@ _see [VS Code Portable Mode](https://code.visualstudio.com/docs/editor/portable)
 
 ## How to use
 
-1. install
-1. run vds
+1. install vscds
+1. run vscds using terminal
 1. configure settings.json
-1. run vds and enter `?` for help
+1. run vscds and enter `?` or `help` for help
 
 ## Installing
 
