@@ -1,4 +1,4 @@
-# VSCode Data Swapper
+# VS Code Data Swapper
 
 _This is a recreation of [VSCodeManager](https://github.com/doongjohn/VSCodeManager) made with [Nim](https://nim-lang.org/)_
 
@@ -9,19 +9,22 @@ This console app takes advantage of [VS Code Portable Mode](https://code.visuals
 It simply swaps `data` folder!  
 _see [VS Code Portable Mode](https://code.visualstudio.com/docs/editor/portable)_
 
+**※ Currently only tested on Windows!**  
+**※ Currently it does not work on MacOS!**
+
 ## How to use
 
-1. install
-1. run vds
+1. install vscds
+1. run vscds using terminal
 1. configure settings.json
-1. run vds and enter `?` for help
+1. run vscds and enter `?` or `help` for help
 
 ## Installing
 
-using nimble:
+using [nimble](https://github.com/nim-lang/nimble):
 
 ```nimble
-nimble install vds
+nimble install vscds
 ```
 
 ## TODO
@@ -33,4 +36,5 @@ nimble install vds
 - [x] CMD: List all data folers.
 - [x] CMD: Run VSCode.
 - [x] CMD: Reveal VSCode directory in explorer.
+- [ ] ADD: MacOS Support.
 - [ ] FIX: Exterminate bugs.
