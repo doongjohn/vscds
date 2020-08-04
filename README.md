@@ -21,10 +21,10 @@ _see [VS Code Portable Mode](https://code.visualstudio.com/docs/editor/portable)
 
 ## Installing
 
-using nimble:
+using [nimble](https://github.com/nim-lang/nimble):
 
 ```nimble
-nimble install vds
+nimble install vscds
 ```
 
 ## TODO
