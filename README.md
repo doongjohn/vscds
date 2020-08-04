@@ -9,7 +9,8 @@ This console app takes advantage of [VS Code Portable Mode](https://code.visuals
 It simply swaps `data` folder!  
 _see [VS Code Portable Mode](https://code.visualstudio.com/docs/editor/portable)_
 
-**※ Currently only tested on Windows!**
+**※ Currently only tested on Windows!**  
+**※ Currently it does not work on MacOS!**
 
 ## How to use
 
