@@ -44,7 +44,7 @@ let settingsJson = %*
     "vscodeRunCommand": "code",
     "vscodeRevealCommand": "explorer vscode-path",
     "vscodePath": "vscode-path",
-    "dataPrefix": "data-vds-",
+    "dataPrefix": "data-vscds-",
     "currentDataName": "default"
   }
 
