@@ -33,4 +33,5 @@ nimble install vds
 - [x] CMD: List all data folers.
 - [x] CMD: Run VSCode.
 - [x] CMD: Reveal VSCode directory in explorer.
+- [ ] ADD: MacOS Support.
 - [ ] FIX: Exterminate bugs.
