@@ -1,4 +1,4 @@
-# VSCode Data Swapper
+# VS Code Data Swapper
 
 _This is a recreation of [VSCodeManager](https://github.com/doongjohn/VSCodeManager) made with [Nim](https://nim-lang.org/)_
 
@@ -8,6 +8,8 @@ This console app takes advantage of [VS Code Portable Mode](https://code.visuals
 
 It simply swaps `data` folder!  
 _see [VS Code Portable Mode](https://code.visualstudio.com/docs/editor/portable)_
+
+**※ Currently only tested on Windows!**
 
 ## How to use
 
