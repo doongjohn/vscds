@@ -1,5 +1,5 @@
 {
     "nim.project": [
-        "vds.nim"
+        "vscds.nim"
     ],
 }
