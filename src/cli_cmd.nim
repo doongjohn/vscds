@@ -49,45 +49,45 @@ func args*(this: CommandInfo): auto = this.args
 const commandInfos* = [
   CommandInfo(
     commandType: Command.Help,
-    desc: "Shows help.",
+    desc: "Show help.",
     keywords: @["help", "?"],
   ),
   CommandInfo(
     commandType: Command.Clear,
-    desc: "Clears screen.",
+    desc: "Clear screen.",
     keywords: @["clear", "cls"],
   ),
   CommandInfo(
     commandType: Command.Exit,
-    desc: "Exits.",
+    desc: "Exit vscds.",
     keywords: @["exit", "quit", "q"],
   ),
   CommandInfo(
     commandType: Command.OpenSettings,
-    desc: "Open settings.json with VS Code.",
+    desc: "Open \"settings.json\" with VS Code.",
     keywords: @["settings", "setting"],
   ),
   CommandInfo(
     commandType: Command.SwapData,
-    desc: "Swaps data folder.",
+    desc: "Swap data folder.",
     keywords: @["swap", "to"],
     args: @["[Data Name]"],
   ),
   CommandInfo(
     commandType: Command.SwapAndRun,
-    desc: "Swaps data folder and run VS Code.",
+    desc: "Swap data folder and run VS Code.",
     keywords: @["as"],
     args: @["[Data Name]", "[Args...]"],
   ),
   CommandInfo(
     commandType: Command.NewData,
-    desc: "Creates new data folder.",
+    desc: "Create a new data folder.",
     keywords: @["create", "new"],
     args: @["[Data Name]"],
   ),
   CommandInfo(
     commandType: Command.DeleteData,
-    desc: "Deletes existing data folder.",
+    desc: "Delete an existing data folder.",
     keywords: @["delete", "del"],
     args: @["[Data Name]"],
   ),
