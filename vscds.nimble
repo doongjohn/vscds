@@ -2,7 +2,7 @@
 
 version       = "0.2.0"
 author        = "doongjohn"
-description   = "<VS Code Data Swapper> Easily swap between multiple data folders."
+description   = "<VS Code Data Swapper> Easily manage multiple data folders."
 license       = "MIT"
 srcDir        = "src"
 bin           = @["vscds"]
