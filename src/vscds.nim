@@ -7,9 +7,7 @@ proc main() =
   showTitle()
   loadSettingsFile()
   showBasicInfo()
-  setupCommandObjects()
-  while true:
-    getInputAndRunCommand()
+  startCommandLoop()
 
 
 when isMainModule:

@@ -1,18 +1,26 @@
+{.experimental: "codeReordering".}
+
 import sugar
+import os
+import osproc
+import tables
+import terminal
 import strutils
 import strformat
+import app_check
 import app_settings
 import cli_text
 import eh
 
 
 #----------------------------------------------------------------------------------
-# Command enum
+# Command
 #----------------------------------------------------------------------------------
 type Command* {.pure.} = enum
   Help,
   Clear,
   Exit,
+  OpenSettings,
   SwapData,
   SwapAndRun,
   NewData,
@@ -24,120 +32,123 @@ type Command* {.pure.} = enum
 
 
 #----------------------------------------------------------------------------------
-# Command object
+# Command Info
 #----------------------------------------------------------------------------------
-type CommandObject* = object
+type CommandInfo* = object
   commandType: Command
   desc: string
   keywords: seq[string]
   args: seq[string]
-  action: proc(this: CommandObject, inputargs: seq[string]): ref Exception
 
-func commandType*(this: CommandObject): auto = this.commandType
-func desc*(this: CommandObject): auto = this.desc
-func keywords*(this: CommandObject): auto = this.keywords
-func args*(this: CommandObject): auto = this.args
-
-
-#----------------------------------------------------------------------------------
-# All Command objects
-#----------------------------------------------------------------------------------
-var commandObjects* = newSeq[CommandObject]()
+func commandType*(this: CommandInfo): auto = this.commandType
+func desc*(this: CommandInfo): auto = this.desc
+func keywords*(this: CommandInfo): auto = this.keywords
+func args*(this: CommandInfo): auto = this.args
 
 
-#----------------------------------------------------------------------------------
-# Setup Command objects
-#----------------------------------------------------------------------------------
-import cli_cmd_action
-
-
-proc setupCommandObjects*() =
-  commandObjects.add(CommandObject(
+const commandInfos* = @[
+  CommandInfo(
     commandType: Command.Help,
     desc: "Shows help.",
     keywords: @["help", "?"],
-    action: cmdHelp
-  ))
-  commandObjects.add(CommandObject(
+  ),
+  CommandInfo(
     commandType: Command.Clear,
     desc: "Clears screen.",
     keywords: @["clear", "cls"],
-    action: cmdClear
-  ))
-  commandObjects.add(CommandObject(
+  ),
+  CommandInfo(
     commandType: Command.Exit,
     desc: "Exits.",
     keywords: @["exit", "quit", "q"],
-    action: cmdExit
-  ))
-  commandObjects.add(CommandObject(
+  ),
+  CommandInfo(
+    commandType: Command.OpenSettings,
+    desc: "Open settings.json with VS Code.",
+    keywords: @["settings", "setting"],
+  ),
+  CommandInfo(
     commandType: Command.SwapData,
     desc: "Swaps data folder.",
     keywords: @["swap", "to"],
     args: @["[Data Name]"],
-    action: cmdSwapData
-  ))
-  commandObjects.add(CommandObject(
+  ),
+  CommandInfo(
     commandType: Command.SwapAndRun,
-    desc: "Swaps data folder and run VSCode.",
+    desc: "Swaps data folder and run VS Code.",
     keywords: @["as"],
     args: @["[Data Name]", "[Args...]"],
-    action: cmdSwapAndRun
-  ))
-  commandObjects.add(CommandObject(
+  ),
+  CommandInfo(
     commandType: Command.NewData,
     desc: "Creates new data folder.",
     keywords: @["create", "new"],
     args: @["[Data Name]"],
-    action: cmdNewData
-  ))
-  commandObjects.add(CommandObject(
+  ),
+  CommandInfo(
     commandType: Command.DeleteData,
     desc: "Deletes existing data folder.",
     keywords: @["delete", "del"],
     args: @["[Data Name]"],
-    action: cmdDeleteData
-  ))
-  commandObjects.add(CommandObject(
+  ),
+  CommandInfo(
     commandType: Command.RenameData,
     desc: "Renames existing data folder.",
     keywords: @["rename", "rn"],
     args: @["[Old Name]", "[New Name]"],
-    action: cmdRenameData
-  ))
-  commandObjects.add(CommandObject(
+  ),
+  CommandInfo(
     commandType: Command.ListAll,
     desc: "Lists exising data folders.",
     keywords: @["list"],
-    action: cmdListAll
-  ))
-  commandObjects.add(CommandObject(
+  ),
+  CommandInfo(
     commandType: Command.RunVSCode,
-    desc: &"Runs VSCode by using command = \"{settings.vscodeRunCommand}\".",
+    desc: &"Runs VS Code.",
     keywords: @["run", "r"],
     args: @["[Args...]"],
-    action: cmdRunVSCode
-  ))
-  commandObjects.add(CommandObject(
+  ),
+  CommandInfo(
     commandType: Command.RevealVSCodeDirectory,
-    desc: &"Reveals VSCode Directory using command = \"{settings.vscodeRevealCommand}\"",
+    desc: &"Reveals VS Code Directory.",
     keywords: @["reveal"],
-    action: cmdRevealVSCodeDirectory
-  ))
+  )
+]
+
+
+#----------------------------------------------------------------------------------
+# Command Procs
+#----------------------------------------------------------------------------------
+import cli_cmd_proc
+
+const commands = {
+  Command.Help: cmdHelp,
+  Command.Clear: cmdClear,
+  Command.Exit: cmdExit,
+  Command.OpenSettings: cmdOpenSettings,
+  Command.SwapData: cmdSwapData,
+  Command.SwapAndRun: cmdSwapAndRun,
+  Command.NewData: cmdNewData,
+  Command.DeleteData: cmdDeleteData,
+  Command.RenameData: cmdRenameData,
+  Command.ListAll: cmdListAll,
+  Command.RunVSCode: cmdRunVSCode,
+  Command.RevealVSCodeDirectory: cmdRevealVSCodeDirectory
+}.toTable()
 
 
 #----------------------------------------------------------------------------------
 # Check Command args
 #----------------------------------------------------------------------------------
-template checkArgs(this: CommandObject, inputArgs: seq[string]) =
+template checkArgs(this: CommandInfo, inputArgs: seq[string]) =
   if this.args.len == 0 and inputArgs.len > 0:
     say "This command needs no argument!"
     return
   
-  let noLimit = this.args.len > 0 and this.args[^1] == "[Args...]"
-  let minArgsCount = if this.args.len > 0 and noLimit: this.args.high else: this.args.len
+  let noArgLimit = this.args.len > 0 and this.args[^1] == "[Args...]"
+  let minArgsCount = if this.args.len > 0 and noArgLimit: this.args.high else: this.args.len
   
-  if not noLimit and inputArgs.len > minArgsCount:
+  if not noArgLimit and inputArgs.len > minArgsCount:
     say "Too many args!"
     return
   
@@ -149,27 +160,26 @@ template checkArgs(this: CommandObject, inputArgs: seq[string]) =
 
 
 #----------------------------------------------------------------------------------
-# Get input and run command (Run this in a loop)
+# Get input and run commands
 #----------------------------------------------------------------------------------
-proc getInputAndRunCommand*() =
-  say ""
-  say "", ">> ", false
-  let inputs = stdin.readLine().toLowerAscii().splitWhitespace()
-  if inputs.len == 0:
-    say "Invalid Command!"
-    return
-  
-  let inputKeyword = inputs[0]
-  if inputKeyword == "":
-    say "Invalid Command!"
-    return
-  
-  let inputArgs = if inputs.len > 1: inputs[1 .. ^1] else: @[]
-  for obj in commandObjects:
-    for keyword in obj.keywords:
-      if inputKeyword == keyword:
-        obj.checkArgs(inputArgs)
-        obj.action(obj, inputArgs).whenErr((err: Exception) => say &"※ ERROR ※\n{err.msg}")
-        return
-  
-  say "Invalid Command!"
+proc startCommandLoop*() =
+  while true:
+    block theLoop:
+      say ""
+      say "", ">> ", false
+      let inputs = stdin.readLine().toLowerAscii().splitWhitespace()
+      if inputs.len == 0 or inputs[0] == "":
+        say "Invalid Command!"
+        break theLoop
+      
+      let inputKeyword = inputs[0]
+      let inputArgs = if inputs.len > 1: inputs[1 .. ^1] else: @[]
+
+      for cmdInfo in commandInfos:
+        for keyword in cmdInfo.keywords:
+          if inputKeyword == keyword:
+            cmdInfo.checkArgs(inputArgs)
+            commands[cmdInfo.commandType](inputArgs).whenErr((err: Exception) => say &"※ ERROR ※\n{err.msg}")
+            break theLoop
+      
+      say "Invalid Command!"

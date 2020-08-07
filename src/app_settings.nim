@@ -38,7 +38,7 @@ func currentDataName*(this: Settings): auto =
 #----------------------------------------------------------------------------------
 var settings*: Settings = nil
 let settingsFileName = "settings.json"
-let settingsFilePath = joinPath(getAppDir(), settingsFileName)
+let settingsFilePath* = joinPath(getAppDir(), settingsFileName)
 let settingsJson = %*
   {
     "vscodeRunCommand": "code",
