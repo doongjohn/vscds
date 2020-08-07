@@ -46,7 +46,7 @@ func keywords*(this: CommandInfo): auto = this.keywords
 func args*(this: CommandInfo): auto = this.args
 
 
-const commandInfos* = @[
+const commandInfos* = [
   CommandInfo(
     commandType: Command.Help,
     desc: "Shows help.",
