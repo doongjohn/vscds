@@ -140,23 +140,25 @@ const commands = {
 #----------------------------------------------------------------------------------
 # Check Command args
 #----------------------------------------------------------------------------------
-template checkArgs(this: CommandInfo, inputArgs: seq[string]) =
+proc checkArgs(this: CommandInfo, inputArgs: seq[string]): bool =
   if this.args.len == 0 and inputArgs.len > 0:
     say "This command needs no argument!"
-    return
+    return false
   
   let noArgLimit = this.args.len > 0 and this.args[^1] == "[Args...]"
   let minArgsCount = if this.args.len > 0 and noArgLimit: this.args.high else: this.args.len
   
   if not noArgLimit and inputArgs.len > minArgsCount:
     say "Too many args!"
-    return
+    return false
   
   if inputArgs.len < minArgsCount:
     say "Please specify:", lineBreak = false
     for arg in this.args: stdout.write(" " & arg)
     stdout.write "\n"
-    return
+    return false
+
+  return true
 
 
 #----------------------------------------------------------------------------------
@@ -178,8 +180,8 @@ proc startCommandLoop*() =
       for cmdInfo in commandInfos:
         for keyword in cmdInfo.keywords:
           if inputKeyword == keyword:
-            cmdInfo.checkArgs(inputArgs)
-            commands[cmdInfo.commandType](inputArgs).whenErr((err: Exception) => say &"※ ERROR ※\n{err.msg}")
+            if cmdInfo.checkArgs(inputArgs):
+              commands[cmdInfo.commandType](inputArgs).whenErr((err: Exception) => say &"※ ERROR ※\n{err.msg}")
             break theLoop
       
       say "Invalid Command!"
