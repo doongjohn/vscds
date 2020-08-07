@@ -3,7 +3,6 @@
 import math
 import streams
 import strutils
-import strformat
 import terminal
 import utils
 
@@ -28,7 +27,7 @@ proc say*(msg: string, prefix = defaultPrefix, lineBreak = true, keepIndent = tr
       for ch in msg:
         if ch != ' ': break
         indent.inc
-      &"{prefix}{' '.repeat(indent)}"
+      prefix & ' '.repeat(indent)
     else:
       prefix
   
@@ -42,14 +41,15 @@ proc say*(msg: string, prefix = defaultPrefix, lineBreak = true, keepIndent = tr
     loop(i < lineCount, i.inc):
       if i != 0: wrapped.write(prefixWIndent)
       try:
-        wrapped.write(line[i*writeWidth .. i*writeWidth+writeWidth-1])
+        let startPos = i*writeWidth
+        wrapped.write(line[startPos .. startPos+writeWidth-1])
         wrapped.write('\n')
       except:
         wrapped.write(line[i*writeWidth .. ^1])
     result = wrapped.readAllAndClose()
   
   let res = newStringStream()
-  let splited = msg.split('\n')
+  let splited = msg.splitLines()
   var i = 0
   loop(i < splited.len, i.inc):
     if i == 0:
@@ -65,7 +65,7 @@ proc say*(msg: string, prefix = defaultPrefix, lineBreak = true, keepIndent = tr
 proc showTitle*() =
   eraseScreen()
   setCursorPos(0, 0)
-  say "<VSCode Data Swapper>"
+  say "<VS Code Data Swapper>"
 
 
 proc showBasicInfo*() =
