@@ -1,7 +1,5 @@
 # VS Code Data Swapper
 
-_This is a recreation of [VSCodeManager](https://github.com/doongjohn/VSCodeManager) using the [Nim](https://nim-lang.org/)_ language.
-
 This console app takes advantage of [VS Code Portable Mode](https://code.visualstudio.com/docs/editor/portable) to make your VS Code Environment more Organized.
 
 **※ Currently only tested on Windows 10!**  
