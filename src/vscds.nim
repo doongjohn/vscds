@@ -6,7 +6,7 @@ import cli_cmd
 proc main() =
   showTitle()
   loadSettingsFile()
-  showBasicInfo()
+  showWelcomeText()
   startCommandLoop()
 
 

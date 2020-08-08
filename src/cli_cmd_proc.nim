@@ -39,7 +39,7 @@ proc cmdHelp*(inputArgs: seq[string]): ref Exception =
 
 proc cmdClear*(inputArgs: seq[string]): ref Exception =
   showTitle()
-  showBasicInfo()
+  showWelcomeText()
 
 
 proc cmdExit*(inputArgs: seq[string]): ref Exception =

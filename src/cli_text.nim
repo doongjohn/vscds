@@ -65,10 +65,12 @@ proc say*(msg: string, prefix = defaultPrefix, lineBreak = true, keepIndent = tr
 proc showTitle*() =
   eraseScreen()
   setCursorPos(0, 0)
+  say "----------------------"
   say "<VS Code Data Swapper>"
+  say "----------------------"
 
 
-proc showBasicInfo*() =
+proc showWelcomeText*() =
   say "Welcome back!"
   say "Enter \"help\" or \"?\" for help."
 

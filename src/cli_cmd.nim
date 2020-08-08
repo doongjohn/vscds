@@ -1,14 +1,10 @@
 {.experimental: "codeReordering".}
 
 import sugar
-import os
 import osproc
 import tables
-import terminal
 import strutils
 import strformat
-import app_check
-import app_settings
 import cli_text
 import eh
 
@@ -104,13 +100,13 @@ const commandInfos* = [
   ),
   CommandInfo(
     commandType: Command.RunVSCode,
-    desc: &"Runs VS Code.",
+    desc: "Runs VS Code.",
     keywords: @["run", "r"],
     args: @["[Args...]"],
   ),
   CommandInfo(
     commandType: Command.RevealVSCodeDirectory,
-    desc: &"Reveals VS Code Directory.",
+    desc: "Reveals VS Code Directory.",
     keywords: @["reveal"],
   )
 ]
@@ -141,6 +137,8 @@ const commands = {
 # Check Command args
 #----------------------------------------------------------------------------------
 proc checkArgs(this: CommandInfo, inputArgs: seq[string]): bool =
+  result = true
+
   if this.args.len == 0 and inputArgs.len > 0:
     say "This command needs no argument!"
     return false
@@ -157,8 +155,6 @@ proc checkArgs(this: CommandInfo, inputArgs: seq[string]): bool =
     for arg in this.args: stdout.write(" " & arg)
     stdout.write "\n"
     return false
-
-  return true
 
 
 #----------------------------------------------------------------------------------

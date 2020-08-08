@@ -22,6 +22,7 @@ proc noDataFolderFoundError*(): ref Exception =
     createDir(vscDataPath)
     say &"Empty data folder has been created at \"{vscDataPath}\"."
 
+
 #----------------------------------------------------------------------------------
 # Check valid file name
 #----------------------------------------------------------------------------------
