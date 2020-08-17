@@ -154,6 +154,5 @@ proc cmdRunVSCode*(inputArgs: seq[string]): ref Exception =
 
 proc cmdRevealVSCodeDirectory*(inputArgs: seq[string]): ref Exception =
   returnException:
-    # if a explorer.exe is launched successfully, it returns "1"
     let exitCode = execCmd(settings.vscodeRevealCommand)
     say &"Command exit code: {exitCode}"
