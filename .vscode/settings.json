@@ -2,4 +2,7 @@
     "nim.project": [
         "vscds.nim"
     ],
+    "cSpell.ignoreWords": [
+        "vscds"
+    ],
 }

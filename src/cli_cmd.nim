@@ -89,24 +89,24 @@ const commandInfos* = [
   ),
   CommandInfo(
     commandType: Command.RenameData,
-    desc: "Renames existing data folder.",
+    desc: "Rename existing data folder.",
     keywords: @["rename", "rn"],
     args: @["[Old Name]", "[New Name]"],
   ),
   CommandInfo(
     commandType: Command.ListAll,
-    desc: "Lists exising data folders.",
+    desc: "List exising data folders.",
     keywords: @["list"],
   ),
   CommandInfo(
     commandType: Command.RunVSCode,
-    desc: "Runs VS Code.",
+    desc: "Run VS Code.",
     keywords: @["run", "r"],
     args: @["[Args...]"],
   ),
   CommandInfo(
     commandType: Command.RevealVSCodeDirectory,
-    desc: "Reveals VS Code Directory.",
+    desc: "Reveal VS Code Directory.",
     keywords: @["reveal"],
   )
 ]
