@@ -6,7 +6,7 @@ none
 
 ## Changed
 
-- [Storing inactive data]
+- [Storing inactive data] **※Breaking Change!**
   - Now stored in `vscpath/data-inactive/<data-name>` without `dataPrefix`
 
 ## Removed
