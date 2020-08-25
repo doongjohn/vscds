@@ -40,11 +40,11 @@ nimble install vscds
 // Location of the VS Code executable.
 "vscodePath": "D:\\My Apps\\VS-Code",
 
-// Inactive Data folder will be prefixed with this string.
-"dataPrefix": "data-vscds-",
+// Inactive data folders will be stored inside this folder.
+"inactiveFolderName": "data-inactive",
 
 // Currently active Data name.
-// (If it becomes inactive it's folder name will be 'data-vscds-nim')
+// (If it becomes inactive it will be renamed and moved to '<VS Code Path>/data-inactive/nim')
 "currentDataName": "nim"
 ```
 
