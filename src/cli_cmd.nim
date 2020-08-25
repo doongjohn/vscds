@@ -185,7 +185,7 @@ proc startCommandLoop*() =
       say "Suggestions:"
       for cmdInfo in commandInfos:
         for keyword in cmdInfo.keywords:
-          if distance(inputKeyword, keyword) <= (keyword.len().float / 3).int or 
+          if distance(inputKeyword, keyword) <= (keyword.len().float * 0.7).int or 
              jaro_winkler(inputKeyword, keyword) >= 0.75:
             say "  " & keyword
 
