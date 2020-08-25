@@ -1,3 +1,19 @@
+# Version 0.3.0
+
+## Added
+
+none
+
+## Changed
+
+- [Storing inactive data]
+  - Now stored in `vscpath/data-inactive/<data-name>` without `dataPrefix`
+
+## Removed
+
+- [Settings]
+  - Removed `dataPrefix`
+
 # Version 0.2.1
 
 ## Added
