@@ -19,15 +19,15 @@ type Settings* = ref object
   vscodeRunCommand: string
   vscodeRevealCommand: string
   vscodePath: string
-  dataPrefix: string
+  inactiveFolderName: string
   currentDataName: string
 
 func vscodeRunCommand*(this: Settings): auto = this.vscodeRunCommand
 func vscodeRevealCommand*(this: Settings): auto = this.vscodeRevealCommand
 func vscodePath*(this: Settings): auto = this.vscodePath
-func dataPrefix*(this: Settings): auto =
-  if this.dataPrefix == "": raise newException(SettingsError, "dataPrefix can't be empty!")
-  this.dataPrefix
+func inactiveFolderName*(this: Settings): auto =
+  if this.inactiveFolderName == "": raise newException(SettingsError, "inactiveFolderName can't be empty!")
+  this.inactiveFolderName
 func currentDataName*(this: Settings): auto =
   if this.currentDataName == "": raise newException(SettingsError, "currentDataName can't be empty!")
   this.currentDataName
@@ -44,7 +44,7 @@ let settingsJson = %*
     "vscodeRunCommand": "code",
     "vscodeRevealCommand": "explorer vscode-path",
     "vscodePath": "vscode-path",
-    "dataPrefix": "data-vscds-",
+    "inactiveFolderName": "data-inactive",
     "currentDataName": "default"
   }
 
@@ -53,6 +53,7 @@ let settingsJson = %*
 # Data
 #----------------------------------------------------------------------------------
 var vscDataPath* = ""
+var inactiveDataPath* = ""
 
 
 #----------------------------------------------------------------------------------
@@ -68,9 +69,8 @@ proc checkSettingsFileExists(): bool =
 
 proc validateSettings() =
   try:
-    if settings.dataPrefix == "": raise newException(SettingsError, "dataPrefix can't be empty!")
-    if settings.currentDataName == "": raise newException(SettingsError, "currentDataName can't be empty!")
-    vscDataPath = joinPath(settings.vscodePath, "data")
+    discard settings.inactiveFolderName()
+    discard settings.currentDataName()
   except: 
     echo getCurrentExceptionMsg()
     quit()
@@ -92,6 +92,8 @@ proc loadSettingsFile*() =
   try:
     settings = settingsFilePath.parseFile().to Settings
     validateSettings()
+    vscDataPath = joinPath(settings.vscodePath, "data")
+    inactiveDataPath = joinPath(settings.vscodePath, settings.inactiveFolderName)
   except:
     say &"Corrupted \"{settingsFileName}\"!"
     newSettingsFile()

@@ -53,7 +53,7 @@ proc cmdOpenSettings*(inputArgs: seq[string]): ref Exception =
 
 proc cmdSwapData*(inputArgs: seq[string]): ref Exception =
   let swapName = inputArgs[0]
-  let swapPath = joinPath(settings.vscodePath, settings.dataPrefix & swapName)
+  let swapPath = joinPath(inactiveDataPath, swapName)
 
   if not checkVscDataExists():
     return noDataFolderFoundError()
@@ -63,7 +63,7 @@ proc cmdSwapData*(inputArgs: seq[string]): ref Exception =
     return newException(Exception, &"Can't find target data directory! \"{swapPath}\"")
   
   returnException:
-    vscDataPath.moveDir(joinPath(settings.vscodePath, settings.dataPrefix & settings.currentDataName))
+    vscDataPath.moveDir(joinPath(inactiveDataPath, settings.currentDataName))
     swapPath.moveDir(vscDataPath)
     say &"Successfully swapped! \"{settings.currentDataName}\" -> \"{swapName}\""
     saveSettingsFile(swapName)
@@ -79,7 +79,7 @@ proc cmdSwapAndRun*(inputArgs: seq[string]): ref Exception =
 
 proc cmdNewData*(inputArgs: seq[string]): ref Exception =
   let newName = inputArgs[0]
-  let newPath = joinPath(settings.vscodePath, settings.dataPrefix & newName)
+  let newPath = joinPath(inactiveDataPath, newName)
 
   if newName == settings.currentDataName:
     return newException(Exception, &"\"{newName}\" = Current Data!")
@@ -94,11 +94,11 @@ proc cmdNewData*(inputArgs: seq[string]): ref Exception =
 
 
 proc cmdDeleteData*(inputArgs: seq[string]): ref Exception =
-  let delName = inputArgs[0]
-  let delPath = joinPath(settings.vscodePath, settings.dataPrefix & delName)
-
-  if delName == settings.currentDataName:
+  if inputArgs[0] == settings.currentDataName:
     return newException(Exception, &"You can't delete Current Data!")
+
+  let delName = inputArgs[0]
+  let delPath = joinPath(inactiveDataPath, delName)
 
   if delPath.existsDir():
       say "Enter \"del\" to confirm: ", lineBreak = false
@@ -116,8 +116,8 @@ proc cmdRenameData*(inputArgs: seq[string]): ref Exception =
   let oldName = inputArgs[0]
   let newName = inputArgs[1]
   let changeCurData = oldName == settings.currentDataName
-  let oldPath = if changeCurData: vscDataPath else: joinPath(settings.vscodePath, settings.dataPrefix & oldName)
-  let newPath = joinPath(settings.vscodePath, settings.dataPrefix & newName)
+  let oldPath = if changeCurData: vscDataPath else: joinPath(inactiveDataPath, oldName)
+  let newPath = joinPath(inactiveDataPath, newName)
   
   if not oldPath.existsDir():
     if changeCurData and not checkVscDataExists():
@@ -141,9 +141,8 @@ proc cmdRenameData*(inputArgs: seq[string]): ref Exception =
 
 proc cmdListAll*(inputArgs: seq[string]): ref Exception =
   if checkVscDataExists(): say &"{settings.currentDataName} (current)"
-  for dir in settings.vscodePath.walkDir(true, false):
-    if dir.path.contains(settings.dataPrefix):
-      say dir.path.replace(settings.dataPrefix, "")
+  for dir in inactiveDataPath.walkDir(true, false):
+    say dir.path.extractFileName()
 
 
 proc cmdRunVSCode*(inputArgs: seq[string]): ref Exception =
