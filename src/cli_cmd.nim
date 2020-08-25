@@ -5,6 +5,7 @@ import osproc
 import tables
 import strutils
 import strformat
+import math
 import cli_text
 import eh
 import nimlevenshtein
@@ -185,7 +186,10 @@ proc startCommandLoop*() =
       say "Suggestions:"
       for cmdInfo in commandInfos:
         for keyword in cmdInfo.keywords:
-          if distance(inputKeyword, keyword) <= (keyword.len().float * 0.7).int or 
-             jaro_winkler(inputKeyword, keyword) >= 0.75:
+          if keyword.len == 1:
+            if contains(inputKeyword, keyword):
+              say "  " & keyword
+          elif distance(inputKeyword, keyword) <= round(keyword.len.float * 0.5).int or 
+               jaro_winkler(inputKeyword, keyword) >= 0.9:
             say "  " & keyword
 
