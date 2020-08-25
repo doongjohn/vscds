@@ -7,6 +7,7 @@ import strutils
 import strformat
 import cli_text
 import eh
+import nimlevenshtein
 
 
 #----------------------------------------------------------------------------------
@@ -181,3 +182,10 @@ proc startCommandLoop*() =
             break theLoop
       
       say "Invalid Command!"
+      say "Suggestions:"
+      for cmdInfo in commandInfos:
+        for keyword in cmdInfo.keywords:
+          if distance(inputKeyword, keyword) <= (keyword.len().float / 3).int or 
+             jaro_winkler(inputKeyword, keyword) >= 0.75:
+            say "  " & keyword
+
