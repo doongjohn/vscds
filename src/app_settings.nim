@@ -69,8 +69,8 @@ proc checkSettingsFileExists(): bool =
 
 proc validateSettings() =
   try:
-    discard settings.inactiveFolderName()
-    discard settings.currentDataName()
+    if settings.inactiveFolderName == "": raise newException(SettingsError, "inactiveFolderName can't be empty!")
+    if settings.currentDataName == "": raise newException(SettingsError, "currentDataName can't be empty!")
   except: 
     echo getCurrentExceptionMsg()
     quit()
