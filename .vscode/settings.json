@@ -3,6 +3,7 @@
         "vscds.nim"
     ],
     "cSpell.ignoreWords": [
-        "vscds"
+        "vscds",
+        "vscpath"
     ],
 }
