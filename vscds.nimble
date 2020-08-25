@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.3.0"
+version       = "0.3.1"
 author        = "doongjohn"
 description   = "<VS Code Data Swapper> Easily manage multiple data folders."
 license       = "MIT"
@@ -12,3 +12,4 @@ bin           = @["vscds"]
 # Dependencies
 
 requires "nim >= 1.2.0"
+requires "nimlevenshtein >= 0.1.0"
