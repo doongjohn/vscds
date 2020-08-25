@@ -62,3 +62,7 @@ nimble install vscds
 ## TODO
 - [ ] ADD: MacOS Support(?).
 - [ ] FIX: Exterminate bugs.
+
+## Change Log
+
+[CHANGELOG.md](https://github.com/doongjohn/vscds/blob/master/CHANGELOG.md)
