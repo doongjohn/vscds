@@ -1,3 +1,18 @@
+# Version 0.3.1
+
+## Added
+
+- [Command]
+  - Added command suggestions. (using nimlevenshtein)
+
+## Changed
+
+none
+
+## Removed
+
+none
+
 # Version 0.3.0
 
 ## Added
@@ -7,12 +22,12 @@ none
 ## Changed
 
 - [Storing inactive data] **※ Breaking Change!**
-  - Now stored in `vscpath/data-inactive/<data-name>` without `dataPrefix`
+  - Now stored in `vscpath/data-inactive/<data-name>` without a `dataPrefix`.
 
 ## Removed
 
 - [Settings]
-  - Removed `dataPrefix`
+  - Removed `dataPrefix`.
 
 # Version 0.2.1
 
