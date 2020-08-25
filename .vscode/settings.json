@@ -3,6 +3,7 @@
         "vscds.nim"
     ],
     "cSpell.ignoreWords": [
+        "nimlevenshtein",
         "vscds",
         "vscpath"
     ],
