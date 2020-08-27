@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.3.1"
+version       = "0.3.2"
 author        = "doongjohn"
 description   = "<VS Code Data Swapper> Easily manage multiple data folders."
 license       = "MIT"
