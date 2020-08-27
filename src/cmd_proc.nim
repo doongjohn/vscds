@@ -3,13 +3,13 @@
 import os
 import osproc
 import sugar
-import strutils
 import strformat
 import terminal
 import app_settings
 import app_check
-import cli_text
-import cli_cmd
+import cli_say
+import cli_spinner
+import cmd_common
 import eh
 
 
@@ -104,8 +104,9 @@ proc cmdDeleteData*(inputArgs: seq[string]): ref Exception =
       say "Enter \"del\" to confirm: ", lineBreak = false
       if stdin.readLine() == "del":
         returnException:
+          startLoadingSpinner("removing...", &"Successfully removed: \"{delPath}\"")
           removeDir(delPath)
-          say &"Successfully removed: \"{delPath}\""
+          endLoadingSpinner()
       else:
         say &"Delete canceled!"
   else:

@@ -1,7 +1,7 @@
 import os
 import strutils
 import strformat
-import cli_text
+import cli_say
 import app_settings
 import eh
 

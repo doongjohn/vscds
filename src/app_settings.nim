@@ -3,7 +3,7 @@
 import os
 import strformat
 import json
-import cli_text
+import cli_say
 
 
 #----------------------------------------------------------------------------------

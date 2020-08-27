@@ -1,6 +1,6 @@
 import app_settings
-import cli_text
-import cli_cmd
+import cli_say
+import cmd_run
 
 
 proc main() =
