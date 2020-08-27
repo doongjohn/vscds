@@ -1,6 +1,6 @@
 {
     "nim.project": [
-        "vscds.nim"
+        "src/vscds.nim"
     ],
     "cSpell.ignoreWords": [
         "nimlevenshtein",
