@@ -1,33 +1,34 @@
 {.experimental: "codeReordering".}
 
 import math
-import streams
 import strutils
 import terminal
 import utils
 
 
 const defaultPrefix = "| "
-var sayBuffer = newStringStream()
+var sayBuffer = ""
 
 
 proc sayAdd*(msg: string) =
-  sayBuffer.write(msg)
+  sayBuffer &= msg
 
 
 proc sayIt*(prefix = defaultPrefix, lineBreak = true, keepIndent = true) =
-  say(sayBuffer.readAllAndClose(), prefix, lineBreak, keepIndent)
-  sayBuffer = newStringStream()
+  say(sayBuffer, prefix, lineBreak, keepIndent)
+  sayBuffer = ""
+
+
+proc getIndentCount(text: string): int =
+  for c in text:
+    if c != ' ': break
+    result.inc()
 
 
 proc say*(msg: string, prefix = defaultPrefix, lineBreak = true, keepIndent = true) =
   let prefixWIndent = 
     if keepIndent:
-      var indent = 0
-      for ch in msg:
-        if ch != ' ': break
-        indent.inc
-      prefix & ' '.repeat(indent)
+      prefix & ' '.repeat(msg.getIndentCount())
     else:
       prefix
   
@@ -35,31 +36,25 @@ proc say*(msg: string, prefix = defaultPrefix, lineBreak = true, keepIndent = tr
   
   proc lineWrap(line: string): string =
     if line.len <= writeWidth: return line
-    let wrapped = newStringStream()
-    let lineCount = (line.len.float / writeWidth.float).ceil.int
     var i = 0
-    loop(i < lineCount, i.inc):
-      if i != 0: wrapped.write(prefixWIndent)
-      try:
-        let startPos = i*writeWidth
-        wrapped.write(line[startPos .. startPos+writeWidth-1])
-        wrapped.write('\n')
-      except:
-        wrapped.write(line[i*writeWidth .. ^1])
-    result = wrapped.readAllAndClose()
+    loop(i < (line.len.float / writeWidth.float).ceil.int, i.inc()):
+      if i != 0:
+        result &= '\n' & prefixWIndent
+      let startPos = i*writeWidth-i
+      let endPos = startPos+writeWidth-2
+      if line.len >= endPos:
+        result &= line[startPos .. endPos]
+      else:
+        result &= line[startPos .. ^1]
   
-  let res = newStringStream()
+  var final = ""
   let splited = msg.splitLines()
   var i = 0
   loop(i < splited.len, i.inc):
-    if i == 0:
-      res.write(prefix)
-    else:
-      res.write('\n')
-      res.write(prefixWIndent)
-    res.write(splited[i].lineWrap())
-  if lineBreak: res.write('\n')
-  stdout.write(res.readAllAndClose())
+    final &= (if i == 0: prefix else: '\n' & prefixWIndent)
+    final &= splited[i].lineWrap()
+  if lineBreak: final &= '\n'
+  stdout.write(final)
 
 
 proc showTitle*() =

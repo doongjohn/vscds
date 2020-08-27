@@ -24,12 +24,14 @@ type Settings* = ref object
 
 func vscodeRunCommand*(this: Settings): auto = this.vscodeRunCommand
 func vscodeRevealCommand*(this: Settings): auto = this.vscodeRevealCommand
-func vscodePath*(this: Settings): auto = this.vscodePath
+func vscodePath*(this: Settings): auto =
+  if this.vscodePath == "": raise newException(SettingsError, "Error [settings.json]: \"vscodePath\" can't be empty!")
+  this.vscodePath
 func inactiveFolderName*(this: Settings): auto =
-  if this.inactiveFolderName == "": raise newException(SettingsError, "inactiveFolderName can't be empty!")
+  if this.inactiveFolderName == "": raise newException(SettingsError, "Error [settings.json]: \"inactiveFolderName\" can't be empty!")
   this.inactiveFolderName
 func currentDataName*(this: Settings): auto =
-  if this.currentDataName == "": raise newException(SettingsError, "currentDataName can't be empty!")
+  if this.currentDataName == "": raise newException(SettingsError, "Error[settings.json]: \"currentDataName\" can't be empty!")
   this.currentDataName
 
 
@@ -62,18 +64,24 @@ var inactiveDataPath* = ""
 proc checkSettingsFileExists(): bool =
   result = true
   if not settingsFilePath.existsFile():
-    say &"Can't find \"{settingsFileName}\"!"
+    say &"Error [settings.json]: Can't find \"settings.json\"!"
     newSettingsFile()
     result = false
 
 
 proc validateSettings() =
-  try:
-    if settings.inactiveFolderName == "": raise newException(SettingsError, "inactiveFolderName can't be empty!")
-    if settings.currentDataName == "": raise newException(SettingsError, "currentDataName can't be empty!")
-  except: 
-    echo getCurrentExceptionMsg()
-    quit()
+  var hasError = false
+  template check(thing: untyped) =
+    try:
+      discard thing
+    except:
+      hasError = true
+      echo getCurrentExceptionMsg()
+
+  check(vscodePath(settings))
+  check(inactiveFolderName(settings))
+  check(currentDataName(settings))
+  if hasError: quit()
 
 
 #----------------------------------------------------------------------------------
@@ -90,12 +98,15 @@ proc newSettingsFile() =
 proc loadSettingsFile*() =
   if not checkSettingsFileExists(): quit()
   try:
+    # parse json file
     settings = settingsFilePath.parseFile().to Settings
+    # validate json file
     validateSettings()
+    # init variables
     vscDataPath = joinPath(settings.vscodePath, "data")
     inactiveDataPath = joinPath(settings.vscodePath, settings.inactiveFolderName)
   except:
-    say &"Corrupted \"{settingsFileName}\"!"
+    say &"Error [settings.json]: Can't parse JSON file!"
     newSettingsFile()
     quit()
 
