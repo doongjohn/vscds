@@ -1,3 +1,18 @@
+# Version 0.3.3
+
+## Added
+
+- [CLI]
+  - Added loading spinner when deleting data folder. 
+
+## Changed
+
+none
+
+## Removed
+
+none
+
 # Version 0.3.2
 
 ## Added
@@ -7,7 +22,7 @@ none
 ## Changed
 
 - [Misc]
- - Improved error msg and say proc performance.
+  - Improved error msg and say proc performance.
 
 ## Removed
 
