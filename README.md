@@ -31,9 +31,11 @@ nimble install vscds
 
 ```jsonc
 // Command for starting VS Code.
+// (Uses startProcess())
 "vscodeRunCommand": "code",
 
 // Command for Revealing VS Code directory.
+// (Uses execCmd())
 // (If a explorer.exe is launched successfully, it returns  exit code 1)
 "vscodeRevealCommand": "explorer \"D:\\My Apps\\VS-Code\"",
 
