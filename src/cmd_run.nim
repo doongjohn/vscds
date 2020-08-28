@@ -5,10 +5,10 @@ import tables
 import strutils
 import strformat
 import math
+import utils/eh
 import cli_say
 import cmd_common
 import cmd_proc
-import eh
 import nimlevenshtein
 
 

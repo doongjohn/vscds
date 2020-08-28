@@ -1,9 +1,9 @@
 import os
 import strutils
 import strformat
+import utils/eh
 import cli_say
 import app_settings
-import eh
 
 
 type NoDataFolderFoundError = object of Defect

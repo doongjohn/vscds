@@ -3,15 +3,16 @@
 import math
 import strutils
 import terminal
-import utils
+import utils/loop
 
 
 const defaultPrefix = "| "
 var sayBuffer = ""
 
 
-proc sayAdd*(msg: string) =
-  sayBuffer &= msg
+proc sayAdd*(msgs: varargs[string]) =
+  for msg in msgs:
+    sayBuffer &= msg
 
 
 proc sayIt*(prefix = defaultPrefix, lineBreak = true, keepIndent = true) =
@@ -25,7 +26,7 @@ proc getIndentCount(text: string): int =
     result.inc()
 
 
-proc say*(msg: string, prefix = defaultPrefix, lineBreak = true, keepIndent = true) =
+proc getSayString*(msg: string, prefix = defaultPrefix, lineBreak = true, keepIndent = true): string =
   let prefixWIndent = 
     if keepIndent:
       prefix & ' '.repeat(msg.getIndentCount())
@@ -47,14 +48,16 @@ proc say*(msg: string, prefix = defaultPrefix, lineBreak = true, keepIndent = tr
       else:
         result &= line[startPos .. ^1]
   
-  var final = ""
   let splited = msg.splitLines()
   var i = 0
   loop(i < splited.len, i.inc):
-    final &= (if i == 0: prefix else: '\n' & prefixWIndent)
-    final &= splited[i].lineWrap()
-  if lineBreak: final &= '\n'
-  stdout.write(final)
+    result &= (if i == 0: prefix else: '\n' & prefixWIndent)
+    result &= splited[i].lineWrap()
+  if lineBreak: result &= '\n'
+
+
+proc say*(msg: string, prefix = defaultPrefix, lineBreak = true, keepIndent = true) =
+  stdout.write(getSayString(msg, prefix, lineBreak, keepIndent))
 
 
 proc showTitle*() =
