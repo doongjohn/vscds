@@ -4,35 +4,15 @@ import math
 import strutils
 import terminal
 import utils/loop
+import cli_utils
 
 
 const defaultPrefix = "| "
 var sayBuffer = ""
 
 
-proc sayAdd*(msgs: varargs[string]) =
-  for msg in msgs:
-    sayBuffer &= msg
-
-
-proc sayIt*(prefix = defaultPrefix, lineBreak = true, keepIndent = true) =
-  say(sayBuffer, prefix, lineBreak, keepIndent)
-  sayBuffer = ""
-
-
-proc getIndentCount(text: string): int =
-  for c in text:
-    if c != ' ': break
-    result.inc()
-
-
 proc getSayString*(msg: string, prefix = defaultPrefix, lineBreak = true, keepIndent = true): string =
-  let prefixWIndent = 
-    if keepIndent:
-      prefix & ' '.repeat(msg.getIndentCount())
-    else:
-      prefix
-  
+  let prefixWIndent = prefix & (if keepIndent: ' '.repeat(msg.getIndentCount()) else: "")
   let writeWidth = terminalWidth() - (if keepIndent: prefixWIndent.len() else: prefix.len())
   
   proc lineWrap(line: string): string =
@@ -56,8 +36,35 @@ proc getSayString*(msg: string, prefix = defaultPrefix, lineBreak = true, keepIn
   if lineBreak: result &= '\n'
 
 
-proc say*(msg: string, prefix = defaultPrefix, lineBreak = true, keepIndent = true) =
+proc say*(
+  msg: string,
+  prefix = defaultPrefix,
+  lineBreak = true,
+  keepIndent = true,
+  bgColor = bgDefault,
+  fgColor = fgWhite
+  ) =
+  setBackgroundColor(bgColor)
+  setForegroundColor(fgColor)
   stdout.write(getSayString(msg, prefix, lineBreak, keepIndent))
+  setBackgroundColor(bgDefault)
+  setForegroundColor(fgWhite)
+
+
+proc sayAdd*(msgs: varargs[string]) =
+  for msg in msgs:
+    sayBuffer &= msg
+
+
+proc sayIt*(
+  prefix = defaultPrefix,
+  lineBreak = true,
+  keepIndent = true,
+  bgColor = bgDefault,
+  fgColor = fgDefault
+  ) =
+  say(sayBuffer, prefix, lineBreak, keepIndent, bgColor, fgColor)
+  sayBuffer = ""
 
 
 proc showTitle*() =

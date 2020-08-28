@@ -16,25 +16,21 @@ import cmd_common
 proc cmdHelp*(inputArgs: seq[string]): ref Exception =
   returnException:
     for i_cmd, cmd in commandInfos:
-      say &"{cmd.commandType}: {cmd.desc}"
-      stdout.setForegroundColor(ForegroundColor.fgBlue)
-      sayAdd "  Keywords:"
+      say(&"{cmd.commandType}: {cmd.desc}")
+      sayAdd("  Keywords:")
       for i_keyword, keyword in cmd.keywords:
-        sayAdd (if i_keyword != 0: ", " else: " "), keyword
-      sayIt()
-      stdout.setForegroundColor(ForegroundColor.fgGreen)
+        sayAdd((if i_keyword != 0: ", " else: " "), keyword)
+      sayIt(fgColor = fgBlue)
       if cmd.args.len != 0:
-        sayAdd "  Args:"
+        sayAdd("  Args:")
         for i, arg in cmd.args:
-          sayAdd " ", arg
-        sayIt()
-      stdout.setForegroundColor(ForegroundColor.fgWhite)
+          sayAdd(" ", arg)
+        sayIt(fgColor = fgGreen)
       if i_cmd != commandInfos.high: say ""
 
 
 proc cmdClear*(inputArgs: seq[string]): ref Exception =
   showTitle()
-  showWelcomeText()
 
 
 proc cmdExit*(inputArgs: seq[string]): ref Exception =
@@ -60,7 +56,7 @@ proc cmdSwapData*(inputArgs: seq[string]): ref Exception =
     
     vscDataPath.moveDir(joinPath(inactiveDataPath, settings.currentDataName))
     swapPath.moveDir(vscDataPath)
-    say &"Successfully swapped! \"{settings.currentDataName}\" -> \"{swapName}\""
+    say(&"Successfully swapped! \"{settings.currentDataName}\" -> \"{swapName}\"")
     saveSettingsFile(swapName)
 
 
@@ -83,7 +79,7 @@ proc cmdNewData*(inputArgs: seq[string]): ref Exception =
       return newException(Exception, &"Invalid name!")
     
     createDir(newPath)
-    say &"Successfully created! \"{newPath}\""
+    say(&"Successfully created! \"{newPath}\"")
 
 
 proc cmdDeleteData*(inputArgs: seq[string]): ref Exception =
@@ -96,14 +92,14 @@ proc cmdDeleteData*(inputArgs: seq[string]): ref Exception =
     if not delPath.existsDir():
       return newException(Exception, &"Can't find directory! \"{delPath}\"")
 
-    say "Enter \"del\" to confirm: ", lineBreak = false
+    say("Enter \"del\" to confirm: ", lineBreak = false)
     if stdin.readLine() != "del":
-      say "Delete canceled!"
+      say("Delete canceled!")
       return
     
     startSpinner(cli_spinner.dots, "removing..."):
       removeDir(delPath)
-    say &"Successfully removed: \"{delPath}\""
+    say(&"Successfully removed: \"{delPath}\"")
 
 
 proc cmdRenameData*(inputArgs: seq[string]): ref Exception =
@@ -130,23 +126,24 @@ proc cmdRenameData*(inputArgs: seq[string]): ref Exception =
     
     if changeCurData: saveSettingsFile(newName)
     else: oldPath.moveDir(newPath)
-    say &"Successfully renamed! \"{oldName}\" -> \"{newName}\""
+    say(&"Successfully renamed! \"{oldName}\" -> \"{newName}\"")
 
 
 proc cmdListAll*(inputArgs: seq[string]): ref Exception =
   returnException:
     if checkVscDataExists(): say &"{settings.currentDataName} (current)"
     for dir in inactiveDataPath.walkDir(true, false):
-      say dir.path.extractFileName()
+      say(dir.path.extractFileName())
 
 
 proc cmdRunVSCode*(inputArgs: seq[string]): ref Exception =
   returnException:
+    say(&"Running command: {settings.vscodeRunCommand}")
     discard startProcess(settings.vscodeRunCommand, args = inputArgs)
-    say "Running VS Code..."
 
 
 proc cmdRevealVSCodeDirectory*(inputArgs: seq[string]): ref Exception =
   returnException:
+    say(&"Running command: {settings.vscodeRevealCommand}")
     let exitCode = execCmd(settings.vscodeRevealCommand)
-    say &"Command exit code: {exitCode}"
+    say(&"Command exit code: {exitCode}")

@@ -64,7 +64,7 @@ var inactiveDataPath* = ""
 proc checkSettingsFileExists(): bool =
   result = true
   if not settingsFilePath.existsFile():
-    say &"Error [settings.json]: Can't find \"settings.json\"!"
+    say(&"Error [settings.json]: Can't find \"settings.json\"!")
     newSettingsFile()
     result = false
 
@@ -89,7 +89,7 @@ proc validateSettings() =
 #----------------------------------------------------------------------------------
 proc newSettingsFile() =
   settingsFilePath.writeFile(settingsJson.pretty())
-  say &"New \"{settingsFileName}\" has been created at \"{settingsFilePath}\"\nPlease configure it."
+  say(&"New \"{settingsFileName}\" has been created at \"{settingsFilePath}\"\nPlease configure it.")
 
 
 #----------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ proc loadSettingsFile*() =
     vscDataPath = joinPath(settings.vscodePath, "data")
     inactiveDataPath = joinPath(settings.vscodePath, settings.inactiveFolderName)
   except:
-    say &"Error [settings.json]: Can't parse JSON file!"
+    say(&"Error [settings.json]: Can't parse JSON file!")
     newSettingsFile()
     quit()
 
